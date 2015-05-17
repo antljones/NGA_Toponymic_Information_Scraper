@@ -4,7 +4,7 @@ require 'open-uri'
 require 'json'
 require 'optparse'
 
-site = 'http://earth-info.nga.mil/gns/html/namefiles.html'
+site = 'http://geonames.nga.mil/gns/html/namefiles.html'
 resource_directory = "."
 dbms_type = ""
 format ="csv"
@@ -21,7 +21,7 @@ def retrieve_remote_geocoordinate_resources(site)
   page = Nokogiri::HTML(open(site))
 
   #puts page.class   # => Nokogiri::HTML::Document
-  links = page.css('table tr td a')
+  links = page.css('div table tr td a')
   links.each do |link|
     #Nokogiri::XML::Element method
     if link.key?("href")
@@ -102,7 +102,7 @@ def generate_csv_format(resource_directories, site, headers, country_code_mappin
 end
 
 def generate_json_format(resource_directories, site, headers, country_code_mappings)
-  #rather than waiting for pretty print to handle the whole array, which could take a long 
+  #rather than waiting for pretty print to handle the whole array, which could take a long
   #time, just print each country and add the json array characters
   puts "["
   resource_directories.each do |directory|
@@ -112,7 +112,7 @@ def generate_json_format(resource_directories, site, headers, country_code_mappi
       country_data = {:countryCode => directory.upcase.strip,
                       :countryName => country_code_mappings[directory.downcase].strip,
                       :locations => []}
-  
+
       #parse each file
       File.foreach(data_file) { |line|
 
@@ -140,7 +140,7 @@ def generate_json_format(resource_directories, site, headers, country_code_mappi
   puts "]"
 end
 
-#TODO: generate code for multiple dbms using insert statements 
+#TODO: generate code for multiple dbms using insert statements
 def write_table_properties(dbms_type)
   case dbms_type
   when "oracle"
@@ -223,7 +223,7 @@ def write_table_data(resource_directories, site, headers, country_code_mappings)
           if current_line < line_count - 1
             puts ",\n"
           else
-            puts ";\n\n" 
+            puts ";\n\n"
           end
           current_line += 1
         }
