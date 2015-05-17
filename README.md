@@ -1,6 +1,6 @@
 This script was built for retrieving worldwide location data comprised of location name, latitude, longitude, country name and country code. The data is limited to countries outside the US and has been made freely available. The intent of this project is to make this subset of the data more easily retrievable and convertable into alternate formats including JSON, CSV and SQL.
 
-The script will download any differences (new country code zip files) from http://earth-info.nga.mil/gns/html/namefiles.html however will not update existing files with the latest data. If you need the latest data you can currently use the -f option to download all of the files. sha1 checksums are not currently set up.
+The script will download any differences (new country code zip files) from http://geonames.nga.mil/gns/html/namefiles.html however will not update existing files with the latest data. If you need the latest data you can currently use the -f option to download all of the files. sha1 checksums are not currently set up.
 
 The latitude and longitude data provided is accurate up to six decimal places. For a representation of what this means please see http://en.wikipedia.org/wiki/Decimal_degrees#Accuracy
 
