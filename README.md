@@ -50,4 +50,4 @@ mysql test < output.sql
 ruby geocoordinates.rb -l diff
 
 ####Force retrieve of the latest data
-ruby geocoordinates.rb -f
+ruby geocoordinates.rb -F
