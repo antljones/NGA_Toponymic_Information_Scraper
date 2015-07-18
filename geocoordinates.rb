@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'json'
 require 'optparse'
+require 'archive/zip'
 
 site = 'http://geonames.nga.mil/gns/html/namefiles.html'
 resource_directory = "."
@@ -13,6 +14,17 @@ options = {}
 available_formats = ["sql","csv","json"]
 available_dbms = ["postgres","oracle","mysql","sqlserver"]
 headers = ["Latitude","Longitude","Location","Country Code","Country Name"]
+
+
+def unzip_file (file, destination)
+  Zip::Archive.open_buffer(file) do |zf|
+    # this is a single file archive, so read the first file
+    zf.fopen(zf.get_name(0)) do |f|
+      unzipped = f.read
+      # done! do something with the unzipped file.
+    end
+  end
+end
 
 #TODO: handle http errors
 def retrieve_remote_geocoordinate_resources(site)
@@ -47,17 +59,34 @@ end
 
 def retrieve_geocoordinate_resources(site, country_codes)
   country_codes.each do |country_code|
-    `rm #{country_code + ".zip"}`
-    `wget #{site[0..-15] + "cntyfile/#{country_code}.zip"}`
-    `mkdir #{country_code}`
-    `unzip #{country_code + ".zip"} -d #{country_code}`
-    `rm #{country_code + ".zip"}`
-    #remove the headers and write to a new file
+    zip_file = "#{country_code + ".zip"}"
+	
+	# Remove any existing zip files
+    if (File.exist?("#{country_code + ".zip"}"))
+	    File.delete("#{country_code + ".zip"}")
+	end
+	
+	# Download  the zip file
+	File.open("#{country_code}.zip", "wb") do |saved_file|
+      open("#{site[0..-15]}" + "cntyfile/#{country_code}.zip", "rb") do |read_file|
+        saved_file.write(read_file.read)
+      end
+    end
+	
+	# Extract the zip file
+	Archive::Zip.extract(zip_file, "#{country_code}")
+	
+    # Remove the headers and write to a new file
     if File.exist?(country_code + '/' + country_code + '.txt')
-      `tail -n +2 #{country_code}/#{country_code}.txt > #{country_code}/#{country_code}`
+      #`tail -n +2 #{country_code}/#{country_code}.txt > #{country_code}/#{country_code}`
+	  text=''
+      File.open("#{country_code}/#{country_code}.txt","r"){|f|f.gets;text=f.read}
+      File.open("#{country_code}/#{country_code}.txt","w+"){|f| f.write(text)}
     elsif not File.exist?(country_code + '/' + country_code + '.txt')
       abort("No data for: " + country_code)
     end
+	
+	File.delete(zip_file)
   end
 end
 
